@@ -1,10 +1,19 @@
-var express = require("express");
-var moviesRouter = express.Router();
+const express = require("express");
+const moviesRouter = express.Router();
+const Movies = require("../models/movieModel");
 
-/* GET home page. */
-moviesRouter.route("/")
+/* GET top 15 movies from the DB. */
+moviesRouter.route("/top")
   .get((req, res, next) => {
-    res.send("This is the movies route");
+    Movies.find({imdbRating: {$ne: "N/A"}},{Title: 1, imdbRating: 1})
+      .sort({imdbRating: -1})
+      .limit(15)
+      .then((movie) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(movie);
+      })
+      .catch((err) => next(err));
   })
   .post((req, res, next) => {
     res.statusCode = 403;

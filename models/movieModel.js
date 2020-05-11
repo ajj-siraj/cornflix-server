@@ -27,7 +27,7 @@ const movieSchema = new Schema({
         type: String,
     },
     Year: {
-        type: Number,
+        type: Number | String,
     },
     Actors: {
         type: String,

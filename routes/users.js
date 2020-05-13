@@ -24,21 +24,26 @@ usersRouter
 
 usersRouter
   .route("/signup")
+  .options((req, res, next) => {
+    res.statusCode = 200;
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    // res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.end();
+  })
   .get((req, res, next) => {
     res.statusCode = 403;
     res.setHeader("Content-Type", "text/plain");
     res.end("Operation forbidden for this route.");
   })
-
+  
   .post((req, res, next) => {
     User.register(
       new User({
-        username: req.body.username,
+        username: req.body.userName,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         country: req.body.country,
         age: req.body.age,
-        isAdmin: req.body.isAdmin,
       }),
       req.body.password,
       (err, user) => {
@@ -70,4 +75,5 @@ usersRouter.route("/loginfailed").get((req, res, next) => {
   res.statusCode = 401;
   res.render("loginfailed", { title: "Authentication Error" });
 });
+
 module.exports = usersRouter;

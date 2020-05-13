@@ -5,13 +5,15 @@ const path = require("path");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 const session = require("express-session");
-const MongoStore = require('connect-mongo')(session);
+const MongoStore = require("connect-mongo")(session);
 const passport = require("passport");
 const config = require("./config");
+const cors = require("cors");
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const moviesRouter = require("./routes/movies");
+const searchRouter = require("./routes/search");
 
 const app = express();
 
@@ -21,13 +23,20 @@ const db = mongoose.connect(config.DB_STRING, {
   useUnifiedTopology: true,
 });
 
-db
-  .then(() => console.log("Connected to mongodb server..."))
-  .catch((err) => next(err));
+db.then(() => console.log("Connected to mongodb server...")).catch((err) => next(err));
+
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 //session and passport initialization
 
-const sessionStore = new MongoStore({ mongooseConnection: mongoose.connection, collection: 'sessions' })
+const sessionStore = new MongoStore({
+  mongooseConnection: mongoose.connection,
+  collection: "sessions",
+});
 app.use(
   session({
     secret: config.SECRET_KEY,
@@ -39,8 +48,6 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -55,6 +62,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/movies", moviesRouter);
+app.use("/search", searchRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

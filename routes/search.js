@@ -5,6 +5,12 @@ const Movies = require("../models/movieModel");
 /* GET top 15 movies from the DB. */
 searchRouter
   .route("/")
+  .options((req, res, next) => {
+    res.statusCode = 200;
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    // res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.end();
+  })
   .get((req, res, next) => {
     let query = req.query.q;
     

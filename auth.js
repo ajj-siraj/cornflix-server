@@ -13,30 +13,33 @@ exports.userLogin = passport.authenticate("local", {
 });
 
 exports.validateForm = (req, res, next) => {
-  if (
+  if(req.body.firstName == undefined ||
+    req.body.lastName == undefined ||
+    req.body.userName == undefined ||
+    req.body.country == undefined ||
+    req.body.age == undefined ||
+    req.body.password == undefined ||
+    req.body.passwordAgain == undefined){
+      req.errors = "Some values returned undefined.";
+    }
+  else if (
     req.body.firstName.length == 0 ||
     req.body.lastName.length == 0 ||
     req.body.userName.length == 0 ||
     req.body.country.length == 0 ||
     req.body.age.length == 0 ||
     req.body.password.length == 0 ||
-    req.body.passwordAgain.length == 0 ||
-    req.body.recaptcha.length == 0
+    req.body.passwordAgain.length == 0 
   ) {
-    res.statusCode = 400;
-    res.setHeader("Content-Type", "application/json");
-    res.json({ status: 400, err: "Please fill all required fields." });
+    req.errors = "Please fill all required fields.";
   }
   else if (req.body.password !== req.body.passwordAgain) {
-    res.statusCode = 400;
-    res.setHeader("Content-Type", "application/json");
-    res.json({ status: 400, err: "Passwords do not match" });
+    req.errors = "Passwords do not match";
   }
 
   else if (req.body.terms !== true) {
-    res.statusCode = 400;
-    res.setHeader("Content-Type", "application/json");
-    res.json({ status: 400, err: "Passwords do not match" });
+    req.errors = "You have not agreed to the terms.";
+    
   }
 
   return next();

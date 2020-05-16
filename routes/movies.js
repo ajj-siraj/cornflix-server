@@ -5,6 +5,12 @@ const Movies = require("../models/movieModel");
 /* GET top 15 movies from the DB. */
 moviesRouter
   .route("/top")
+  .options((req, res, next) => {
+    res.statusCode = 200;
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    // res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.end();
+  })
   .get((req, res, next) => {
     Movies.find({ imdbRating: { $ne: "N/A" } })
       .sort({ imdbRating: -1 })
@@ -35,6 +41,12 @@ moviesRouter
 
 moviesRouter
   .route("/latest")
+  .options((req, res, next) => {
+    res.statusCode = 200;
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    // res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.end();
+  })
   .get((req, res, next) => {
     Movies.find({
       Year: { $ne: "N/A" },

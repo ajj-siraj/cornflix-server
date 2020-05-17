@@ -1,3 +1,4 @@
+require('dotenv').config();
 const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
@@ -18,7 +19,7 @@ const searchRouter = require("./routes/search");
 const app = express();
 
 //mongodb connection
-const db = mongoose.connect(config.DB_STRING, {
+const db = mongoose.connect(process.env.DB_STRING, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -39,7 +40,7 @@ const sessionStore = new MongoStore({
 });
 app.use(
   session({
-    secret: config.SECRET_KEY,
+    secret: process.env.SERVER_SECRET_KEY,
     resave: false,
     saveUninitialized: true,
     store: sessionStore,

@@ -39,11 +39,18 @@ usersRouter
     res.end("Operation forbidden for this route.");
   })
 
-  .post(auth.validateForm, (req, res, next) => {
+  .post(auth.validateForm, auth.verifyCaptcha, (req, res, next) => {
+    if(!res.locals.captcha.success){
+      console.log(res.locals.captcha['error-codes']);
+      res.statusCode = 400;
+      res.setHeader("Content-Type", "application/json");
+      res.json({success: false, status: 400, message: "Captcha verification failed. Please try again."});
+      return;
+    }
     if (req.errors) {
       res.statusCode = 400;
       res.setHeader("Content-Type", "application/json");
-      res.json({ success: false, status: 400, err: req.errors });
+      res.json({ success: false, status: 400, message: req.errors });
       return;
       
     } else {

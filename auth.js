@@ -52,12 +52,6 @@ exports.validateForm = (req, res, next) => {
 };
 
 exports.verifyCaptcha = async (req, res, next) => {
-  // console.log(req.body.recaptcha);
-  let captchareq = {
-    secret: process.env.GOOGLE_CAPTCHA_SECRET,
-    response: req.body.recaptcha,
-  };
-  console.log(captchareq);
   try {
     let captchares = await fetch(process.env.GOOGLE_VERIFY_URL, {
       method: "POST",
@@ -65,7 +59,7 @@ exports.verifyCaptcha = async (req, res, next) => {
       headers: { "Content-Type": "application/x-www-form-urlencoded; charset=utf-8" },
     });
     let result = await captchares.json();
-    console.log("RESPONSE form inside verifyCaptcha: ", result);
+
     res.locals.captcha = result;
     return next();
   } catch (ex) {

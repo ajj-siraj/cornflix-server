@@ -19,7 +19,14 @@ usersRouter
     res.setHeader("Content-Type", "text/plain");
     res.end("Operation forbidden for this route.");
   })
-  .post(auth.userLogin, (req, res, next) => {
+  .post(auth.userLogin, auth.verifyCaptcha, (req, res, next) => {
+    if(!res.locals.captcha.success){
+      console.log(res.locals.captcha['error-codes']);
+      res.statusCode = 400;
+      res.setHeader("Content-Type", "application/json");
+      res.json({success: false, status: 400, message: "Captcha verification failed. Please try again."});
+      return;
+    }
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
     res.json({ success: true, message: "Login successful!" });
@@ -47,7 +54,7 @@ usersRouter
       res.json({success: false, status: 400, message: "Captcha verification failed. Please try again."});
       return;
     }
-    if (req.errors) {
+    if (req.locals.errors) {
       res.statusCode = 400;
       res.setHeader("Content-Type", "application/json");
       res.json({ success: false, status: 400, message: req.errors });
@@ -104,7 +111,8 @@ usersRouter
   })
   .get((req, res, next) => {
     res.statusCode = 401;
-    res.render("loginfailed", { title: "Authentication Error" });
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: false, message: "Incorrect credentials."});
   });
 
 module.exports = usersRouter;

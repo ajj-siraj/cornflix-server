@@ -13,6 +13,7 @@ passport.deserializeUser(User.deserializeUser());
 
 exports.userLogin = passport.authenticate("local", {
   session: true,
+  failureRedirect: '/users/loginfailed'
 });
 
 exports.validateForm = (req, res, next) => {
@@ -26,7 +27,7 @@ exports.validateForm = (req, res, next) => {
     req.body.passwordAgain == undefined ||
     req.body.recaptcha == undefined
   ) {
-    req.errors = "Some values returned undefined.";
+    req.locals.errors = "Some values returned undefined.";
   } else if (
     req.body.firstName.length == 0 ||
     req.body.lastName.length == 0 ||
@@ -37,9 +38,9 @@ exports.validateForm = (req, res, next) => {
     req.body.passwordAgain.length == 0 ||
     req.body.recaptcha.length == 0
   ) {
-    req.errors = "Please fill all required fields.";
+    req.locals.errors = "Please fill all required fields.";
   } else if (req.body.terms !== true) {
-    req.errors = "You have not agreed to the terms.";
+    req.locals.errors = "You have not agreed to the terms.";
   }
 
   return next();

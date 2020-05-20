@@ -4,13 +4,33 @@ const passport = require("passport");
 const auth = require("../auth");
 const User = require("../models/userModel");
 
-/* GET users listing. */
+//validate user session first
+usersRouter.get("/validatesession", passport.authenticate("local"), (req, res, next) => {
+  console.log(req.query);
+  if (req.session.passport.user) {
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json");
+    res.json({ success: true, status: 200, message: "Session verified." });
+    return;
+  }
 
+  res.statusCode = 404;
+  res.setHeader("Content-Type", "application/json");
+  res.json({
+    success: false,
+    status: 404,
+    message: "Session not found.",
+  });
+  return;
+});
+
+//login route
 usersRouter
   .route("/login")
   .options((req, res, next) => {
     res.statusCode = 200;
-    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+    
     // res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.end();
   })
@@ -20,11 +40,17 @@ usersRouter
     res.end("Operation forbidden for this route.");
   })
   .post(auth.userLogin, auth.verifyCaptcha, (req, res, next) => {
-    if(!res.locals.captcha.success){
-      console.log(res.locals.captcha['error-codes']);
+    console.log(req.user);
+    if (!res.locals.captcha.success) {
+      console.log(res.locals.captcha["error-codes"]);
       res.statusCode = 400;
+      res.cookie('session-id', req.sessionID, {expires: new Date(Date.now() + 9999999), httpOnly: false});
       res.setHeader("Content-Type", "application/json");
-      res.json({success: false, status: 400, message: "Captcha verification failed. Please try again."});
+      res.json({
+        success: false,
+        status: 400,
+        message: "Captcha verification failed. Please try again.",
+      });
       return;
     }
     res.statusCode = 200;
@@ -47,11 +73,15 @@ usersRouter
   })
 
   .post(auth.validateForm, auth.verifyCaptcha, (req, res, next) => {
-    if(!res.locals.captcha.success){
-      console.log(res.locals.captcha['error-codes']);
+    if (!res.locals.captcha.success) {
+      console.log(res.locals.captcha["error-codes"]);
       res.statusCode = 400;
       res.setHeader("Content-Type", "application/json");
-      res.json({success: false, status: 400, message: "Captcha verification failed. Please try again."});
+      res.json({
+        success: false,
+        status: 400,
+        message: "Captcha verification failed. Please try again.",
+      });
       return;
     }
     if (req.locals.errors) {
@@ -59,7 +89,6 @@ usersRouter
       res.setHeader("Content-Type", "application/json");
       res.json({ success: false, status: 400, message: req.errors });
       return;
-      
     } else {
       User.register(
         new User({
@@ -100,6 +129,24 @@ usersRouter
     }
   });
 
+//logout
+usersRouter.get("/logout", (req, res, next) => {
+  if (req.session) {
+    console.log(req.sessionID);
+    req.session.destroy();
+    res.clearCookie("session-id");
+    console.log(req.sessionID);
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json");
+    res.json({ success: true, message: "Logged out successfully" });
+    return;
+  } else {
+    res.statusCode = 403;
+    res.setHeader("Content-Type", "application/json");
+    res.json({ success: false, message: "You are not logged in." });
+    return;
+  }
+});
 //login fail redirect
 usersRouter
   .route("/loginfailed")
@@ -111,8 +158,8 @@ usersRouter
   })
   .get((req, res, next) => {
     res.statusCode = 401;
-    res.setHeader('Content-Type', 'application/json');
-    res.json({success: false, message: "Incorrect credentials."});
+    res.setHeader("Content-Type", "application/json");
+    res.json({ success: false, message: "Incorrect credentials." });
   });
 
 module.exports = usersRouter;

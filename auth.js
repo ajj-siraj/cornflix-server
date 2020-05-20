@@ -18,25 +18,25 @@ exports.userLogin = passport.authenticate("local", {
 
 exports.validateForm = (req, res, next) => {
   if (
-    req.body.firstName == undefined ||
-    req.body.lastName == undefined ||
-    req.body.userName == undefined ||
-    req.body.country == undefined ||
-    req.body.age == undefined ||
-    req.body.password == undefined ||
-    req.body.passwordAgain == undefined ||
-    req.body.recaptcha == undefined
+    req.body.firstName === undefined ||
+    req.body.lastName === undefined ||
+    req.body.userName === undefined ||
+    req.body.country === undefined ||
+    req.body.age === undefined ||
+    req.body.password === undefined ||
+    req.body.passwordAgain === undefined ||
+    req.body.recaptcha === undefined
   ) {
     req.locals.errors = "Some values returned undefined.";
   } else if (
-    req.body.firstName.length == 0 ||
-    req.body.lastName.length == 0 ||
-    req.body.userName.length == 0 ||
-    req.body.country.length == 0 ||
-    req.body.age.length == 0 ||
-    req.body.password.length == 0 ||
-    req.body.passwordAgain.length == 0 ||
-    req.body.recaptcha.length == 0
+    req.body.firstName.length === 0 ||
+    req.body.lastName.length === 0 ||
+    req.body.userName.length === 0 ||
+    req.body.country.length === 0 ||
+    req.body.age.length === 0 ||
+    req.body.password.length === 0 ||
+    req.body.passwordAgain.length === 0 ||
+    req.body.recaptcha.length === 0
   ) {
     req.locals.errors = "Please fill all required fields.";
   } else if (req.body.terms !== true) {
@@ -44,12 +44,6 @@ exports.validateForm = (req, res, next) => {
   }
 
   return next();
-
-  // else if (req.body.recaptcha !== true) {
-  //   res.statusCode = 400;
-  //   res.setHeader("Content-Type", "application/json");
-  //   res.json({ status: 400, err: "Passwords do not match" });
-  // }
 };
 
 exports.verifyCaptcha = async (req, res, next) => {

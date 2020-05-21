@@ -80,8 +80,8 @@ app.use(
     store: sessionStore,
     cookie: {
       path:"/",
-      httpOnly: false,
-      expires: 900000
+      httpOnly: true,
+      expires: 9999999999999999
     }
   })
 );

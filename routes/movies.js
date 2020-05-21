@@ -1,6 +1,7 @@
 const express = require("express");
 const moviesRouter = express.Router();
 const Movies = require("../models/movieModel");
+const auth = require("../auth");
 
 /* GET top 15 movies from the DB. */
 moviesRouter
@@ -12,6 +13,7 @@ moviesRouter
     res.end();
   })
   .get((req, res, next) => {
+    console.log(req.user);
     let pageNum = req.query.p > 0 ? req.query.p : 0;
     Movies.find({ imdbRating: { $ne: "N/A" } })
       .sort({ imdbRating: -1 })

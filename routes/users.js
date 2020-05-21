@@ -37,7 +37,7 @@ usersRouter
     res.end("Operation forbidden for this route.");
   })
   .post(auth.userLogin, (req, res, next) => {
-    console.log(req.user);
+    console.log(req.session);
     //captcha verification code that must be uncommented before build 
     // (don't forget to add auth.verifyCaptcha middleware)
     // if (!res.locals.captcha.success) {
@@ -72,6 +72,7 @@ usersRouter
   })
 
   .post(auth.validateForm, auth.verifyCaptcha, (req, res, next) => {
+    // console.log(res.locals);
     if (!res.locals.captcha.success) {
       console.log(res.locals.captcha["error-codes"]);
       res.statusCode = 400;
@@ -83,10 +84,10 @@ usersRouter
       });
       return;
     }
-    if (req.locals.errors) {
+    if (res.locals.errors) {
       res.statusCode = 400;
       res.setHeader("Content-Type", "application/json");
-      res.json({ success: false, status: 400, message: req.errors });
+      res.json({ success: false, status: 400, message: res.locals.errors });
       return;
     } else {
       User.register(

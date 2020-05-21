@@ -29,9 +29,6 @@ usersRouter
   .route("/login")
   .options((req, res, next) => {
     res.statusCode = 200;
-    res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-    
-    // res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.end();
   })
   .get((req, res, next) => {
@@ -39,20 +36,22 @@ usersRouter
     res.setHeader("Content-Type", "text/plain");
     res.end("Operation forbidden for this route.");
   })
-  .post(auth.userLogin, auth.verifyCaptcha, (req, res, next) => {
+  .post(auth.userLogin, (req, res, next) => {
     console.log(req.user);
-    if (!res.locals.captcha.success) {
-      console.log(res.locals.captcha["error-codes"]);
-      res.statusCode = 400;
-      res.cookie('session-id', req.sessionID, {expires: new Date(Date.now() + 9999999), httpOnly: false});
-      res.setHeader("Content-Type", "application/json");
-      res.json({
-        success: false,
-        status: 400,
-        message: "Captcha verification failed. Please try again.",
-      });
-      return;
-    }
+    //captcha verification code that must be uncommented before build 
+    // (don't forget to add auth.verifyCaptcha middleware)
+    // if (!res.locals.captcha.success) {
+    //   console.log(res.locals.captcha["error-codes"]);
+    //   res.statusCode = 400;
+    //   res.cookie('session-id', req.sessionID, {expires: new Date(Date.now() + 9999999), httpOnly: false});
+    //   res.setHeader("Content-Type", "application/json");
+    //   res.json({
+    //     success: false,
+    //     status: 400,
+    //     message: "Captcha verification failed. Please try again.",
+    //   });
+    //   return;
+    // }
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
     res.json({ success: true, message: "Login successful!" });

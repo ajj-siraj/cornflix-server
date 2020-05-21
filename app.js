@@ -18,7 +18,12 @@ const searchRouter = require("./routes/search");
 
 const app = express();
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 //configure cors
 let whitelist = ["http://localhost:3000"];
@@ -46,12 +51,7 @@ const db = mongoose.connect(process.env.DB_STRING, {
 
 db.then(() => console.log("Connected to mongodb server...")).catch((err) => next(err));
 
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.header("Access-Control-Allow-Credentials", true);
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+
 
 //session and passport initialization
 
@@ -79,8 +79,9 @@ app.use(
     saveUninitialized: true,
     store: sessionStore,
     cookie: {
+      path:"/",
       httpOnly: false,
-      expires: 600
+      expires: 900000
     }
   })
 );
@@ -93,6 +94,7 @@ app.use("/users", usersRouter);
 app.use("/movies", moviesRouter);
 app.use("/search", searchRouter);
 
+app.use(express.static(path.join(__dirname, "public")));
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

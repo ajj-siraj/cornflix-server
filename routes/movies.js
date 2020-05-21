@@ -17,11 +17,11 @@ moviesRouter
       .sort({ imdbRating: -1 })
       .skip(pageNum * 15)
       .limit(15)
-      .then((movie) => {
+      .then((movies) => {
         res.statusCode = 200;
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Content-Type", "application/json");
-        res.json(movie);
+        res.json(movies);
       })
       .catch((err) => next(err));
   })

@@ -1,6 +1,8 @@
 const express = require("express");
 const moviesRouter = express.Router();
 const Movies = require("../models/movieModel");
+const User = require("../models/userModel");
+const passport = require('passport');
 const auth = require("../auth");
 
 /* GET top 15 movies from the DB. */
@@ -8,7 +10,7 @@ moviesRouter
   .route("/top")
   .options((req, res, next) => {
     res.statusCode = 200;
-    res.setHeader("Access-Control-Allow-Origin", "*");
+    // res.setHeader("Access-Control-Allow-Origin", "*");
     // res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.end();
   })
@@ -21,7 +23,7 @@ moviesRouter
       .limit(15)
       .then((movies) => {
         res.statusCode = 200;
-        res.setHeader("Access-Control-Allow-Origin", "*");
+        // res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Content-Type", "application/json");
         res.json(movies);
       })

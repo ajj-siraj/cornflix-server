@@ -11,10 +11,7 @@ const passport = require("passport");
 // const config = require("./config");
 const cors = require("cors");
 
-const indexRouter = require("./routes/index");
-const usersRouter = require("./routes/users");
-const moviesRouter = require("./routes/movies");
-const searchRouter = require("./routes/search");
+
 
 const app = express();
 
@@ -35,7 +32,7 @@ app.use(
       if (!origin) return callback(null, true);
       if (whitelist.indexOf(origin) === -1) {
         var message =
-          "The CORS policy for this origin doesn't allow access from the particular origin.";
+          "Not allowed";
         return callback(new Error(message), false);
       }
       return callback(null, true);
@@ -51,7 +48,13 @@ const db = mongoose.connect(process.env.DB_STRING, {
 
 db.then(() => console.log("Connected to mongodb server...")).catch((err) => next(err));
 
+// view engine setup
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "pug");
 
+app.use(logger("dev"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 //session and passport initialization
 
@@ -60,23 +63,12 @@ const sessionStore = new MongoStore({
   collection: "sessions",
 });
 
-
-// view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "pug");
-
-app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser(process.env.SERVER_SECRET_KEY));
-
-
 //session
 app.use(
   session({
     secret: process.env.SERVER_SECRET_KEY,
-    resave: false,
-    saveUninitialized: true,
+    resave: true,
+    saveUninitialized: false,
     store: sessionStore,
     cookie: {
       path:"/",
@@ -89,12 +81,17 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+const indexRouter = require("./routes/index");
+const usersRouter = require("./routes/users");
+const moviesRouter = require("./routes/movies");
+const searchRouter = require("./routes/search");
+
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/movies", moviesRouter);
 app.use("/search", searchRouter);
 
-app.use(express.static(path.join(__dirname, "public")));
+// app.use(express.static(path.join(__dirname, "public")));
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

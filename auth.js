@@ -5,12 +5,24 @@ const fetch = require("node-fetch");
 const config = require("./config");
 const User = require("./models/userModel");
 
-exports.local = passport.use(
+passport.use(
   new LocalStrategy({ usernameField: "userName", passwordField: "password" }, User.authenticate())
 );
+
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+// passport.serializeUser(function(user, done) {
+//   done(null, user._id);
+// });
+
+// passport.deserializeUser(function(user, done) {
+//   User.findById(user._id)
+//     .then((user) => {
+//         done(null, user);
+//     })
+//     .catch(err => next(err))
+// });
 exports.verifyUser = (req, res, next) => {
   if(req.session.passport.user !== undefined){
     User.find({username: req.session.passport.user})

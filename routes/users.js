@@ -5,24 +5,26 @@ const auth = require("../auth");
 const User = require("../models/userModel");
 
 //validate user session first
-usersRouter.get("/validatesession", passport.authenticate("local"), (req, res, next) => {
-  console.log(req.query);
-  if (req.session.passport.user) {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "application/json");
-    res.json({ success: true, status: 200, message: "Session verified." });
-    return;
-  }
+usersRouter
+  .route("/validatesession")
+  .get(passport.authenticate("local"), (req, res, next) => {
+    console.log(req.session);
+    if (req.session.passport.user) {
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json({ success: true, status: 200, message: "Session verified." });
+      return;
+    }
 
-  res.statusCode = 404;
-  res.setHeader("Content-Type", "application/json");
-  res.json({
-    success: false,
-    status: 404,
-    message: "Session not found.",
+    res.statusCode = 404;
+    res.setHeader("Content-Type", "application/json");
+    res.json({
+      success: false,
+      status: 404,
+      message: "Session not found.",
+    });
+    return;
   });
-  return;
-});
 
 //login route
 usersRouter
@@ -37,8 +39,9 @@ usersRouter
     res.end("Operation forbidden for this route.");
   })
   .post(auth.userLogin, (req, res, next) => {
-    console.log(req.session);
-    //captcha verification code that must be uncommented before build 
+    // req.login(req.user, (whatever) => console.log(whatever));
+    console.log(req.user);
+    //captcha verification code that must be uncommented before build
     // (don't forget to add auth.verifyCaptcha middleware)
     // if (!res.locals.captcha.success) {
     //   console.log(res.locals.captcha["error-codes"]);

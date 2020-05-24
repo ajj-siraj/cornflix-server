@@ -70,11 +70,11 @@ app.use(
     resave: true,
     saveUninitialized: false,
     store: sessionStore,
-    cookie: {
-      path:"/",
-      httpOnly: true,
-      expires: 9999999999999999
-    }
+    // cookie: {
+    //   path:"/",
+    //   httpOnly: true,
+    //   expires: 9999999999999999
+    // }
   })
 );
 

@@ -15,7 +15,6 @@ moviesRouter
     res.end();
   })
   .get((req, res, next) => {
-    console.log(req.user);
     let pageNum = req.query.p > 0 ? req.query.p : 0;
     Movies.find({ imdbRating: { $ne: "N/A" } })
       .sort({ imdbRating: -1 })

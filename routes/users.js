@@ -7,12 +7,17 @@ const User = require("../models/userModel");
 //validate user session first
 usersRouter
   .route("/validatesession")
-  .get(passport.authenticate("local"), (req, res, next) => {
-    console.log(req.session);
-    if (req.session.passport.user) {
+  .get((req, res, next) => {
+    console.log(req.user);
+    if (req.user) {
+      let user = {
+        username: req.user.username,
+        firstname: req.user.firstName,
+        lastname: req.user.lastName
+      }
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
-      res.json({ success: true, status: 200, message: "Session verified." });
+      res.json({ success: true, status: 200, message: "Session verified.", user: user });
       return;
     }
 

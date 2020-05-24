@@ -140,10 +140,11 @@ usersRouter
 //logout
 usersRouter.get("/logout", (req, res, next) => {
   if (req.session) {
-    console.log(req.sessionID);
+
+    req.logOut();
     req.session.destroy();
-    res.clearCookie("session-id");
-    console.log(req.sessionID);
+    res.clearCookie("connect.sid", {path: '/'});
+
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
     res.json({ success: true, message: "Logged out successfully" });

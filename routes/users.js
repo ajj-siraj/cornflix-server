@@ -5,22 +5,10 @@ const auth = require("../auth");
 const User = require("../models/userModel");
 
 //validate user session first
-usersRouter
-  .route("/validatesession")
-  .get((req, res, next) => {
-    console.log(req.user);
-    if (req.user) {
-      let user = {
-        username: req.user.username,
-        firstname: req.user.firstName,
-        lastname: req.user.lastName
-      }
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "application/json");
-      res.json({ success: true, status: 200, message: "Session verified.", user: user });
-      return;
-    }
-
+usersRouter.route("/validatesession").get((req, res, next) => {
+  console.log(req.user);
+  if (!req.user) {
+    res.clearCookie("connect.sid");
     res.statusCode = 404;
     res.setHeader("Content-Type", "application/json");
     res.json({
@@ -29,7 +17,17 @@ usersRouter
       message: "Session not found.",
     });
     return;
-  });
+  }
+  let user = {
+    username: req.user.username,
+    firstname: req.user.firstName,
+    lastname: req.user.lastName,
+  };
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json");
+  res.json({ success: true, status: 200, message: "Session verified.", user: user });
+  return;
+});
 
 //login route
 usersRouter
@@ -44,7 +42,6 @@ usersRouter
     res.end("Operation forbidden for this route.");
   })
   .post(auth.userLogin, (req, res, next) => {
-    // req.login(req.user, (whatever) => console.log(whatever));
     console.log(req.user);
     //captcha verification code that must be uncommented before build
     // (don't forget to add auth.verifyCaptcha middleware)
@@ -97,53 +94,51 @@ usersRouter
       res.setHeader("Content-Type", "application/json");
       res.json({ success: false, status: 400, message: res.locals.errors });
       return;
-    } else {
-      User.register(
-        new User({
-          username: req.body.userName,
-          firstName: req.body.firstName,
-          lastName: req.body.lastName,
-          country: req.body.country,
-          age: req.body.age,
-        }),
-        req.body.password,
-        (err, user) => {
-          if (err) {
-            res.statusCode = 500;
-            res.setHeader("Content-Type", "application/json");
-            res.json({ err: err });
-          } else {
-            user
-              .save()
-              .then((user) => {
-                auth.userLogin(req, res, () => {
-                  res.statusCode = 200;
-                  res.setHeader("Content-Type", "application/json");
-                  res.json({
-                    success: true,
-                    message: "Registration Successful",
-                    data: {
-                      username: user.username,
-                      firstname: user.firstName,
-                      lastname: user.lastName,
-                    },
-                  });
-                });
-              })
-              .catch((err) => next(err));
-          }
-        }
-      );
     }
+    User.register(
+      new User({
+        username: req.body.userName,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        country: req.body.country,
+        age: req.body.age,
+      }),
+      req.body.password,
+      (err, user) => {
+        if (err) {
+          res.statusCode = 500;
+          res.setHeader("Content-Type", "application/json");
+          res.json({ err: err });
+        } else {
+          user
+            .save()
+            .then((user) => {
+              auth.userLogin(req, res, () => {
+                res.statusCode = 200;
+                res.setHeader("Content-Type", "application/json");
+                res.json({
+                  success: true,
+                  message: "Registration Successful",
+                  data: {
+                    username: user.username,
+                    firstname: user.firstName,
+                    lastname: user.lastName,
+                  },
+                });
+              });
+            })
+            .catch((err) => next(err));
+        }
+      }
+    );
   });
 
 //logout
 usersRouter.get("/logout", (req, res, next) => {
   if (req.session) {
-
     req.logOut();
     req.session.destroy();
-    res.clearCookie("connect.sid", {path: '/'});
+    res.clearCookie("connect.sid", { path: "/" });
 
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
@@ -169,6 +164,7 @@ usersRouter
     res.statusCode = 401;
     res.setHeader("Content-Type", "application/json");
     res.json({ success: false, message: "Incorrect credentials." });
+    return;
   });
 
 module.exports = usersRouter;

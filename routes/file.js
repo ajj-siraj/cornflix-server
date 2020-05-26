@@ -7,10 +7,11 @@ const multer = require("multer");
 const path = require("path");
 const User = require("../models/userModel");
 
+const db = mongoose.connection;
 let gfs;
-mongoose.connection.once("open", () => {
+db.once("open", () => {
   // init stream
-  gfs = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+  gfs = new mongoose.mongo.GridFSBucket(db.db, {
     bucketName: "uploads",
   });
 });
@@ -51,7 +52,6 @@ fileRouter
     return next();
   })
   .post(upload.single("image"), (req, res, next) => {
-    console.log(req.user);
     if (!req.user) {
       res.statusCode = 401;
       res.setHeader("Content-Type", "application/json");
@@ -63,9 +63,29 @@ fileRouter
       return;
     }
 
+    let profilePicId;
+    let delErr = null;
+    if (req.user.profilePic) {
+      db.db.collection("uploads.files", function (err, collection) {
+        collection
+          .findOne({ filename: req.user.profilePic })
+          .then((data) => {
+            profilePicId = data._id;
+          })
+          .then(() => {
+            const id = new mongoose.Types.ObjectId(profilePicId);
+            gfs.delete(id, (err, data) => {
+              if (err) {
+                console.log("Could not delete previous photo.");
+              }
+              console.log("image deleted successfully");
+            });
+          })
+          .catch((err) => next(err));
+      });
+    }
     User.findByIdAndUpdate(req.user._id, { $set: { profilePic: req.file.filename } }, { new: true })
       .then((user) => {
-        console.log(user);
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
         res.json({

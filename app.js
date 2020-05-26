@@ -13,6 +13,7 @@ const cors = require("cors");
 
 
 
+
 const app = express();
 
 app.use(function (req, res, next) {
@@ -45,6 +46,7 @@ const db = mongoose.connect(process.env.DB_STRING, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
 
 db.then(() => console.log("Connected to mongodb server...")).catch((err) => next(err));
 
@@ -85,11 +87,13 @@ const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const moviesRouter = require("./routes/movies");
 const searchRouter = require("./routes/search");
+const fileRouter = require("./routes/file");
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/movies", moviesRouter);
 app.use("/search", searchRouter);
+app.use("/file", fileRouter);
 
 // app.use(express.static(path.join(__dirname, "public")));
 // catch 404 and forward to error handler

@@ -22,6 +22,7 @@ usersRouter.route("/validatesession").get((req, res, next) => {
     username: req.user.username,
     firstname: req.user.firstName,
     lastname: req.user.lastName,
+    profilePic: req.user.profilePic
   };
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json");

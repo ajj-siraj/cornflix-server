@@ -63,6 +63,16 @@ fileRouter
       return;
     }
 
+    if(!req.file){
+      res.statusCode = 400;
+      res.setHeader("Content-Type", "application/json");
+      res.json({
+        success: false,
+        status: 400,
+        message: "No file was sent.",
+      });
+      return;
+    }
     let profilePicId;
     let delErr = null;
     if (req.user.profilePic) {

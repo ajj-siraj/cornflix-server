@@ -22,7 +22,7 @@ usersRouter.route("/validatesession").get((req, res, next) => {
     username: req.user.username,
     firstname: req.user.firstName,
     lastname: req.user.lastName,
-    profilePic: req.user.profilePic
+    profilePic: req.user.profilePic,
   };
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json");
@@ -168,4 +168,37 @@ usersRouter
     return;
   });
 
+usersRouter
+  .route("/account/update")
+  .all((req, res, next) => {
+    if (req.method !== "POST") {
+      res.statusCode = 403;
+      res.setHeader("Content-Type", "application/json");
+      res.json({ success: false, status: 403, message: `${req.method} forbidden on this route.` });
+      return;
+    }
+    return next();
+  })
+  .post(auth.userLogin, (req, res, next) => {
+    if (!req.user) {
+      res.statusCode = 401;
+      res.setHeader("Content-Type", "application/json");
+      res.json({
+        success: false,
+        status: 401,
+        message: "Unauthorized to access this route. Please login.",
+      });
+      return;
+    }
+    console.log("route accessed, check if cookie changed.");
+    res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json({
+        success: true,
+        status: 200,
+        message: "Check cookie, if it hasn't changed, everything is peachy :3 <3",
+      });
+      return;
+    // User.findByIdAndUpdate(req.user._id, {$set: {firstname: req.body.firstName, lastname: req.body.lastName}})
+  });
 module.exports = usersRouter;

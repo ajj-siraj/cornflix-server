@@ -210,4 +210,47 @@ usersRouter
       })
       .catch((err) => next(err));
   });
+
+usersRouter
+  .route("/profile/update")
+  .all((req, res, next) => {
+    if (req.method !== "POST") {
+      res.statusCode = 403;
+      res.setHeader("Content-Type", "application/json");
+      res.json({ success: false, status: 403, message: `${req.method} forbidden on this route.` });
+      return;
+    }
+    return next();
+  })
+  .post((req, res, next) => {
+    if (!req.user) {
+      res.statusCode = 401;
+      res.setHeader("Content-Type", "application/json");
+      res.json({
+        success: false,
+        status: 401,
+        message: "Unauthorized to access this route. Please login.",
+      });
+      return;
+    }
+
+    User.findByIdAndUpdate(
+      req.user._id,
+      { $set: { public: req.body.public } },
+      { new: true }
+    )
+      .then((user) => {
+        console.log(user);
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json({
+          success: true,
+          status: 200,
+          message: "Success!",
+          data: { public: req.body.public },
+        });
+        return;
+      })
+      .catch((err) => next(err));
+  });
 module.exports = usersRouter;

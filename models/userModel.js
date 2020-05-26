@@ -33,6 +33,10 @@ const userSchema = new Schema(
     },
     profilePic: {
       type: String,
+    },
+    public: {
+      type: Boolean,
+      default: true
     }
     // favorites: {
     //   type: Array

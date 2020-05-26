@@ -190,15 +190,24 @@ usersRouter
       });
       return;
     }
-    console.log("route accessed, check if cookie changed.");
-    res.statusCode = 200;
-      res.setHeader("Content-Type", "application/json");
-      res.json({
-        success: true,
-        status: 200,
-        message: "Check cookie, if it hasn't changed, everything is peachy :3 <3",
-      });
-      return;
-    // User.findByIdAndUpdate(req.user._id, {$set: {firstname: req.body.firstName, lastname: req.body.lastName}})
+
+    User.findByIdAndUpdate(
+      req.user._id,
+      { $set: { firstName: req.body.firstName, lastName: req.body.lastName } },
+      { new: true }
+    )
+      .then((user) => {
+        console.log(user);
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json({
+          success: true,
+          status: 200,
+          message: "Success!",
+          data: { NewFirstName: req.body.firstName, NewLastName: req.body.lastName },
+        });
+        return;
+      })
+      .catch((err) => next(err));
   });
 module.exports = usersRouter;

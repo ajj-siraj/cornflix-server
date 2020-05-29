@@ -9,6 +9,10 @@ passport.use(
   new LocalStrategy({ usernameField: "userName", passwordField: "password" }, User.authenticate())
 );
 
+// passport.use(
+//   new LocalStrategy("verifyPw", { usernameField: "userName", passwordField: "passwordCurrent" }, User.authenticate())
+// );
+
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
@@ -24,20 +28,24 @@ passport.deserializeUser(User.deserializeUser());
 //     .catch(err => next(err))
 // });
 exports.verifyUser = (req, res, next) => {
-  if(req.session.passport.user !== undefined){
-    User.find({username: req.session.passport.user})
-      .then(user => {
+  if (req.session.passport.user !== undefined) {
+    User.find({ username: req.session.passport.user })
+      .then((user) => {
         console.log(user);
         return next();
       })
-      .catch(err => next(err))
+      .catch((err) => next(err));
   }
   return next();
-}
+};
 exports.userLogin = passport.authenticate("local", {
   session: true,
-  failureRedirect: '/users/loginfailed'
+  failureRedirect: "/users/loginfailed",
 });
+// exports.userLoginAfterPwChange = passport.authenticate("verifyPw", {
+//   session: true,
+//   failureRedirect: "/users/loginfailed",
+// });
 
 exports.validateForm = (req, res, next) => {
   if (

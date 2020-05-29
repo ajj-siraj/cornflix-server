@@ -23,7 +23,7 @@ usersRouter.route("/validatesession").get((req, res, next) => {
     firstname: req.user.firstName,
     lastname: req.user.lastName,
     profilePic: req.user.profilePic,
-    public: req.user.public
+    public: req.user.public,
   };
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json");
@@ -213,6 +213,66 @@ usersRouter
   });
 
 usersRouter
+  .route("/account/update-password")
+  .all((req, res, next) => {
+    if (req.method !== "POST") {
+      res.statusCode = 403;
+      res.setHeader("Content-Type", "application/json");
+      res.json({ success: false, status: 403, message: `${req.method} forbidden on this route.` });
+      return;
+    }
+    return next();
+  })
+  .post((req, res, next) => {
+    if (!req.user) {
+      res.statusCode = 401;
+      res.setHeader("Content-Type", "application/json");
+      res.json({
+        success: false,
+        status: 401,
+        message: "Unauthorized to access this route. Please login.",
+      });
+      return;
+    }
+
+    User.findById(req.user._id)
+      .then((user) => {
+        user
+          .changePassword(req.body.passwordCurrent, req.body.passwordNew)
+          .then(() => {
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.json({
+              success: true,
+              status: 200,
+              message: "Password changed successfully.",
+            });
+            return;
+          })
+          .catch((err) => {
+            res.statusCode = 403;
+            res.setHeader("Content-Type", "application/json");
+            res.json({
+              success: false,
+              status: 403,
+              message: err,
+            });
+            return;
+          });
+      })
+      .catch((err) => {
+        res.statusCode = 400;
+        res.setHeader("Content-Type", "application/json");
+        res.json({
+          success: false,
+          status: 400,
+          message: "User not found in the database.",
+        });
+        return;
+      });
+  });
+
+usersRouter
   .route("/profile/update")
   .all((req, res, next) => {
     if (req.method !== "POST") {
@@ -235,11 +295,7 @@ usersRouter
       return;
     }
 
-    User.findByIdAndUpdate(
-      req.user._id,
-      { $set: { public: req.body.public } },
-      { new: true }
-    )
+    User.findByIdAndUpdate(req.user._id, { $set: { public: req.body.public } }, { new: true })
       .then((user) => {
         console.log(user);
         res.statusCode = 200;

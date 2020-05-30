@@ -22,7 +22,7 @@ usersRouter.route("/validatesession").get((req, res, next) => {
     username: req.user.username,
     firstname: req.user.firstName,
     lastname: req.user.lastName,
-    profilePic: req.user.profilePic,
+    profilePic: req.user.profilePic || "e85acd175298eabbe8b9c90d0e3aa92e.png",
     public: req.user.public,
   };
   res.statusCode = 200;

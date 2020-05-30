@@ -89,11 +89,13 @@ const moviesRouter = require("./routes/movies");
 const searchRouter = require("./routes/search");
 const fileRouter = require("./routes/file");
 
+
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/movies", moviesRouter);
 app.use("/search", searchRouter);
 app.use("/file", fileRouter);
+
 
 // app.use(express.static(path.join(__dirname, "public")));
 // catch 404 and forward to error handler

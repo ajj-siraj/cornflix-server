@@ -88,6 +88,7 @@ const usersRouter = require("./routes/users");
 const moviesRouter = require("./routes/movies");
 const searchRouter = require("./routes/search");
 const fileRouter = require("./routes/file");
+const favoritesRouter = require("./routes/favorites");
 
 
 app.use("/", indexRouter);
@@ -95,6 +96,7 @@ app.use("/users", usersRouter);
 app.use("/movies", moviesRouter);
 app.use("/search", searchRouter);
 app.use("/file", fileRouter);
+app.use("/favorites", favoritesRouter);
 
 
 // app.use(express.static(path.join(__dirname, "public")));

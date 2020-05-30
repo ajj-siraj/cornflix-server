@@ -6,7 +6,6 @@ const User = require("../models/userModel");
 
 //validate user session first
 usersRouter.route("/validatesession").get((req, res, next) => {
-  console.log(req.user);
   if (!req.user) {
     res.clearCookie("connect.sid");
     res.statusCode = 404;
@@ -18,17 +17,23 @@ usersRouter.route("/validatesession").get((req, res, next) => {
     });
     return;
   }
-  let user = {
-    username: req.user.username,
-    firstname: req.user.firstName,
-    lastname: req.user.lastName,
-    profilePic: req.user.profilePic || "e85acd175298eabbe8b9c90d0e3aa92e.png",
-    public: req.user.public,
-  };
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "application/json");
-  res.json({ success: true, status: 200, message: "Session verified.", user: user });
-  return;
+
+  User.findById(req.user._id)
+    .populate("favorites", "-_id")
+    .then((user) => {
+      let userData = {
+        username: user.username,
+        firstname: user.firstName,
+        lastname: user.lastName,
+        profilePic: user.profilePic || "e85acd175298eabbe8b9c90d0e3aa92e.png",
+        public: user.public,
+        favorites: user.favorites || [],
+      };
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json({ success: true, status: 200, message: "Session verified.", user: userData });
+      return;
+    });
 });
 
 //login route

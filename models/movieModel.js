@@ -17,6 +17,9 @@ const movieSchema = new Schema({
     PosterThumb: {
         type: String,
     },
+    PosterFeat: {
+        type: String,
+    },
     Type: {
         type: String,
     },

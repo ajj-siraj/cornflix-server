@@ -38,6 +38,16 @@ exports.verifyUser = (req, res, next) => {
   }
   return next();
 };
+exports.isLoggedIn = (req, res, next) => {
+  if (!req.user) {
+    res.statusCode = 401;
+    res.setHeader("Content-Type", "application/json");
+    res.json({ success: false, status: 401, message: "You are not logged in." });
+    return;
+  }
+  return next();
+};
+
 exports.userLogin = passport.authenticate("local", {
   session: true,
   failureRedirect: "/users/loginfailed",

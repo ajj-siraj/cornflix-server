@@ -1,13 +1,15 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const passport = require("passport");
 const favoritesRouter = express.Router();
 const Movie = require("../models/movieModel");
 const User = require("../models/userModel");
+const auth = require("../auth");
 
 favoritesRouter
   .route("/")
   .all((req, res, next) => {
-    if (req.method !== "POST" && req.method !== "GET") {
+    if (req.method !== "POST" && req.method !== "GET" && req.method !== "DELETE") {
       res.statusCode = 403;
       res.setHeader("Content-Type", "application/json");
       res.json({ success: false, status: 403, message: `${req.method} forbidden on this route.` });
@@ -15,14 +17,7 @@ favoritesRouter
     }
     return next();
   })
-  .get((req, res, next) => {
-    if (!req.user) {
-      res.statusCode = 401;
-      res.setHeader("Content-Type", "application/json");
-      res.json({ success: false, status: 401, message: "You are not logged in." });
-      return;
-    }
-
+  .get(auth.isLoggedIn, (req, res, next) => {
     User.findById(req.user._id)
       .populate("favorites", "-_id")
       .then((user) => {
@@ -46,14 +41,7 @@ favoritesRouter
       .catch((err) => next(err));
   })
 
-  .post((req, res, next) => {
-    if (!req.user) {
-      res.statusCode = 401;
-      res.setHeader("Content-Type", "application/json");
-      res.json({ success: false, status: 401, message: "You are not logged in." });
-      return;
-    }
-
+  .post(auth.isLoggedIn, (req, res, next) => {
     User.findById(req.user._id)
       .then((user) => {
         Movie.findOne({ imdbID: req.body.movieID })
@@ -90,6 +78,33 @@ favoritesRouter
             });
             return;
           });
+      })
+      .catch((err) => next(err));
+  })
+
+  .delete(auth.isLoggedIn, (req, res, next) => {
+    // console.log(req.body.imdbID);
+    User.findById(req.user._id)
+      .populate("favorites")
+      .then((user) => {
+        // console.log(user);
+        // let favToRemove = false;
+        let favToRemove = user.favorites.findIndex((fav) => fav.imdbID === req.body.imdbID);
+        console.log(favToRemove);
+        if (favToRemove === undefined) {
+          res.statusCode = 404;
+          res.setHeader("Content-Type", "application/json");
+          res.json({ success: false, status: 404, message: "Movie is not in your favorites." });
+          return;
+        }
+
+        user.favorites.splice(favToRemove, 1);
+        user.save().then(() => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json({ success: true, status: 200, message: "Successfully removed from favorites." });
+          return;
+        });
       })
       .catch((err) => next(err));
   });

@@ -25,6 +25,7 @@ usersRouter.route("/validatesession").get((req, res, next) => {
         username: user.username,
         firstname: user.firstName,
         lastname: user.lastName,
+        email: user.email,
         profilePic: user.profilePic || "e85acd175298eabbe8b9c90d0e3aa92e.png",
         public: user.public,
         favorites: user.favorites || [],
@@ -102,11 +103,13 @@ usersRouter
       res.json({ success: false, status: 400, message: res.locals.errors });
       return;
     }
+    console.log(req.body);
     User.register(
       new User({
         username: req.body.userName,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
+        email: req.body.email,
         country: req.body.country,
         age: req.body.age,
       }),
@@ -130,6 +133,7 @@ usersRouter
                     username: user.username,
                     firstname: user.firstName,
                     lastname: user.lastName,
+                    email: user.email,
                   },
                 });
               });
@@ -272,6 +276,56 @@ usersRouter
           success: false,
           status: 400,
           message: "User not found in the database.",
+        });
+        return;
+      });
+  });
+
+usersRouter
+  .route("/account/reset-password")
+  .all((req, res, next) => {
+    if (req.method !== "POST") {
+      res.statusCode = 403;
+      res.setHeader("Content-Type", "application/json");
+      res.json({ success: false, status: 403, message: `${req.method} forbidden on this route.` });
+      return;
+    }
+    return next();
+  })
+  .post((req, res, next) => {
+    if(req.user){
+      res.statusCode = 400;
+        res.setHeader("Content-Type", "application/json");
+        res.json({
+          success: false,
+          status: 400,
+          message:
+            "User is already logged in.",
+        });
+        return;
+    }
+
+    User.findOne({ email: req.body.email })
+      .then((user) => {
+        console.log(user);
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json({
+          success: true,
+          status: 200,
+          message:
+            "A message has been sent to the specified email with instructions. Please check your email.",
+        });
+        return;
+      })
+      .catch((err) => {
+        res.statusCode = 404;
+        res.setHeader("Content-Type", "application/json");
+        res.json({
+          success: false,
+          status: 404,
+          message:
+            "Email not found.",
         });
         return;
       });

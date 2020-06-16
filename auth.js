@@ -61,6 +61,7 @@ exports.validateForm = (req, res, next) => {
   if (
     req.body.firstName === undefined ||
     req.body.lastName === undefined ||
+    req.body.email === undefined ||
     req.body.userName === undefined ||
     req.body.country === undefined ||
     req.body.age === undefined ||
@@ -72,6 +73,7 @@ exports.validateForm = (req, res, next) => {
   } else if (
     req.body.firstName.length === 0 ||
     req.body.lastName.length === 0 ||
+    req.body.email.length === 0 ||
     req.body.userName.length === 0 ||
     req.body.country.length === 0 ||
     req.body.age.length === 0 ||
@@ -80,6 +82,8 @@ exports.validateForm = (req, res, next) => {
     req.body.recaptcha.length === 0
   ) {
     res.locals.errors = "Please fill all required fields.";
+  } else if (!config.emailRegex.test(req.body.email)) {
+    res.locals.errors = "User entered an invalid email.";
   } else if (req.body.terms !== true) {
     res.locals.errors = "You have not agreed to the terms.";
   }

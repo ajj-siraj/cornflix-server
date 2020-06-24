@@ -11,9 +11,6 @@ const passport = require("passport");
 // const config = require("./config");
 const cors = require("cors");
 
-
-
-
 const app = express();
 
 app.use(function (req, res, next) {
@@ -22,8 +19,10 @@ app.use(function (req, res, next) {
   next();
 });
 
+app.use(express.static(path.join(__dirname, "public")));
+
 //configure cors
-let whitelist = ["http://localhost:3000"];
+let whitelist = ["http://localhost:4000"];
 
 app.use(
   cors({
@@ -32,7 +31,7 @@ app.use(
       if (!origin) return callback(null, true);
       if (whitelist.indexOf(origin) === -1) {
         var message =
-          "Not allowed";
+          "Not allowed by CORS";
         return callback(new Error(message), false);
       }
       return callback(null, true);
@@ -89,16 +88,21 @@ const searchRouter = require("./routes/search");
 const fileRouter = require("./routes/file");
 const favoritesRouter = require("./routes/favorites");
 
+app.use("/api/users", usersRouter);
+app.use("/api/movies", moviesRouter);
+app.use("/api/search", searchRouter);
+app.use("/api/file", fileRouter);
+app.use("/api/favorites", favoritesRouter);
 
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
-app.use("/movies", moviesRouter);
-app.use("/search", searchRouter);
-app.use("/file", fileRouter);
-app.use("/favorites", favoritesRouter);
+// app.use("/*", indexRouter);
+app.get('/*', function (req, res) {
+  res.redirect("/");
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 
-// app.use(express.static(path.join(__dirname, "public")));
+
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

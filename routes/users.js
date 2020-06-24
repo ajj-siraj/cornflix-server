@@ -293,16 +293,15 @@ usersRouter
     return next();
   })
   .post((req, res, next) => {
-    if(req.user){
-      res.statusCode = 400;
-        res.setHeader("Content-Type", "application/json");
-        res.json({
-          success: false,
-          status: 400,
-          message:
-            "User is already logged in.",
-        });
-        return;
+    if (req.user) {
+      res.statusCode = 403;
+      res.setHeader("Content-Type", "application/json");
+      res.json({
+        success: false,
+        status: 403,
+        message: "User is already logged in.",
+      });
+      return;
     }
 
     User.findOne({ email: req.body.email })
@@ -319,13 +318,13 @@ usersRouter
         return;
       })
       .catch((err) => {
-        res.statusCode = 404;
+        res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
         res.json({
-          success: false,
-          status: 404,
+          success: true,
+          status: 200,
           message:
-            "Email not found.",
+            "A message has been sent to the specified email with instructions. Please check your email.",
         });
         return;
       });

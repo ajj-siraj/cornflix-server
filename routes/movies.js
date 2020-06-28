@@ -25,6 +25,7 @@ moviesRouter
         // res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Content-Type", "application/json");
         res.json(movies);
+        return;
       })
       .catch((err) => next(err));
   })
@@ -68,6 +69,7 @@ moviesRouter
         // res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Content-Type", "application/json");
         res.json(movie);
+        return;
       })
       .catch((err) => next(err));
   })

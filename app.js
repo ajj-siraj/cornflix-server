@@ -23,7 +23,7 @@ app.use(function (req, res, next) {
 app.use(express.static(path.join(__dirname, "public")));
 
 //configure cors
-let whitelist = ["http://localhost:3000", "http://localhost:4000", "http://localhost:5000"];
+let whitelist = ["http://localhost:3000", "http://localhost:4000", "http://localhost:5000", "http://cornflix.herokuapp.com/"];
 
 app.use(
   cors({

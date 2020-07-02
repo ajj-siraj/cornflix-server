@@ -88,16 +88,18 @@ const moviesRouter = require("./routes/movies");
 const searchRouter = require("./routes/search");
 const fileRouter = require("./routes/file");
 const favoritesRouter = require("./routes/favorites");
+const newsRouter = require("./routes/news");
 
 app.use("/api/users", usersRouter);
 app.use("/api/movies", moviesRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/file", fileRouter);
 app.use("/api/favorites", favoritesRouter);
+app.use("/api/news", newsRouter);
 
 // app.use("/*", indexRouter);
 app.get('/*', function (req, res) {
-  res.redirect("/");
+  // res.redirect("/");
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 

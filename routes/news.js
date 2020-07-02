@@ -39,7 +39,7 @@ newsAgenda.define("fetchNews", (job, done) => {
 newsRouter
   .route("/")
   .get((req, res, next) => {
-    News.find({}).then((story) => {
+    News.find({},"-_id").then((story) => {
       if (!story) {
         res.statusCode = 404;
         res.setHeader("Content-Type", "text/plain");

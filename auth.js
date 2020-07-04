@@ -50,7 +50,7 @@ exports.isLoggedIn = (req, res, next) => {
 
 exports.userLogin = passport.authenticate("local", {
   session: true,
-  failureRedirect: "/users/loginfailed",
+  failureRedirect: "/api/users/loginfailed",
 });
 // exports.userLoginAfterPwChange = passport.authenticate("verifyPw", {
 //   session: true,

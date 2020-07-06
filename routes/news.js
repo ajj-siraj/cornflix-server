@@ -32,7 +32,6 @@ newsAgenda.define("fetchNews", (job, done) => {
     })
     .then(() => done())
     .catch((err) => console.log(err));
-  console.log("The JOB");
 });
 
 /* GET news */

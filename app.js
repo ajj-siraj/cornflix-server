@@ -2,7 +2,6 @@ require("dotenv").config();
 const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
-const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 const session = require("express-session");
@@ -50,8 +49,8 @@ const db = mongoose.connect(process.env.DB_STRING, {
 db.then(() => console.log("Connected to mongodb server...")).catch((err) => next(err));
 
 // view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "pug");
+// app.set("views", path.join(__dirname, "views"));
+// app.set("view engine", "pug");
 
 app.use(logger("dev"));
 app.use(express.json());
